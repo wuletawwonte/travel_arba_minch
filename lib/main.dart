@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Visit Arba Minch',
       theme: ThemeData(
+        primaryColor: Colors.purple,
         primarySwatch: Colors.teal,
       ),
       home: HomeScreen(),

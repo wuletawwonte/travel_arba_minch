@@ -8,7 +8,10 @@
             "name": "travel_arba_minch",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "debug"
+            "flutterMode": "debug",
+            "args": [
+                "--no-sound-null-safety"
+                ]
         }
     ]
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:travel_arba_minch/widgets/custom_tab_indicator.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -7,6 +8,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // PageView Controller
+  final _pageController = PageController(viewportFraction: 0.877);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +77,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       unselectedLabelStyle:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                       indicator: RoundedRectangleTabIndicator(
-                          color: Color(0xFF000000), width: 15, weight: 2.4),
+                        color: Theme.of(context).primaryColor,
+                        width: 15,
+                        weight: 2.4,
+                      ),
                       tabs: [
                         Tab(
                           child: Container(
@@ -98,6 +105,55 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   )),
+              // Pageview for the destinations
+              Container(
+                height: 180,
+                margin: EdgeInsets.only(top: 16),
+                child: PageView(
+                  physics: BouncingScrollPhysics(),
+                  controller: _pageController,
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(right: 28.8),
+                      width: 300,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9.6),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                            "http://10.144.12.82/img/arbaminchcrocodileranch.jpg",
+                          ),
+                        ),
+                      ),
+                      child: Text("What the heck"),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(right: 28.8),
+                      width: 300,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9.6),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              "https://firebasestorage.googleapis.com/v0/b/my-first-project-45d43.appspot.com/o/img%2F183094995_5350799221656648_394279319031240409_n.jpg?alt=media&token=6fb2e60e-6416-4b6a-bc1f-c38f1e909d5a"),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Smooth page indicator part
+              Padding(
+                padding: EdgeInsets.only(left: 28.8, top: 28.8),
+                child: SmoothPageIndicator(
+                  controller: _pageController,
+                  count: 2,
+                  effect: WormEffect(),
+                ),
+              )
             ],
           ),
         ),
