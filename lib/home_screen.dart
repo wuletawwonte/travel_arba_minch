@@ -123,6 +123,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         image: DecorationImage(
                           fit: BoxFit.cover,
                           image: NetworkImage(
+                            "http://10.144.12.82/img/nechsarnationalpark.jpg",
+                          ),
+                        ),
+                      ),
+                      child: Text("What the heck"),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(right: 28.8),
+                      width: 300,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9.6),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
                             "http://10.144.12.82/img/arbaminchcrocodileranch.jpg",
                           ),
                         ),
@@ -147,11 +162,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Smooth page indicator part
               Padding(
-                padding: EdgeInsets.only(left: 28.8, top: 28.8),
+                padding: EdgeInsets.only(left: 28.8, top: 20),
                 child: SmoothPageIndicator(
                   controller: _pageController,
-                  count: 2,
-                  effect: WormEffect(),
+                  count: 3,
+                  effect: ExpandingDotsEffect(
+                    activeDotColor: Theme.of(context).primaryColor,
+                    dotHeight: 9,
+                    dotWidth: 9,
+                  ),
                 ),
               )
             ],
