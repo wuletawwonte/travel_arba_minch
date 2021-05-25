@@ -127,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      child: Text("What the heck"),
                     ),
                     Container(
                       margin: EdgeInsets.only(right: 28.8),
