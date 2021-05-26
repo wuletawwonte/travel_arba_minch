@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:travel_arba_minch/widgets/custom_tab_indicator.dart';
+
+import 'models/destination.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,6 +16,32 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // PageView Controller
   final _pageController = PageController(viewportFraction: 0.877);
+  List<Destination> destinations = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<List<Destination>> _getDestinations() async {
+    try {
+      final response = await http
+          .get(Uri.parse('http://10.144.12.82/public/rest/destinations'));
+      if (response.statusCode == 200) {
+        Iterable result = json.decode(response.body);
+        setState(() {
+          destinations = result.map((m) => Destination.fromJSON(m)).toList();
+        });
+        return destinations;
+      } else {
+        throw "Unable to fetch Destinations";
+      }
+    } on SocketException {
+      throw "No Internet Connection";
+    } on HttpException {
+      throw "Unable to fetch Destinations";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       unselectedLabelStyle:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                       indicator: RoundedRectangleTabIndicator(
-                        color: Theme.of(context).primaryColor,
-                        width: 15,
-                        weight: 2.4,
-                      ),
+                          color: Theme.of(context).primaryColor,
+                          width: 15,
+                          weight: 2.4),
                       tabs: [
                         Tab(
                           child: Container(
@@ -109,62 +140,47 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 height: 180,
                 margin: EdgeInsets.only(top: 16),
-                child: PageView(
-                  physics: BouncingScrollPhysics(),
-                  controller: _pageController,
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(right: 28.8),
-                      width: 300,
-                      height: 180,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9.6),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(
-                            "http://10.144.12.82/img/nechsarnationalpark.jpg",
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(right: 28.8),
-                      width: 300,
-                      height: 180,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9.6),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(
-                            "http://10.144.12.82/img/arbaminchcrocodileranch.jpg",
-                          ),
-                        ),
-                      ),
-                      child: Text("What the heck"),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(right: 28.8),
-                      width: 300,
-                      height: 180,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9.6),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(
-                              "https://firebasestorage.googleapis.com/v0/b/my-first-project-45d43.appspot.com/o/img%2F183094995_5350799221656648_394279319031240409_n.jpg?alt=media&token=6fb2e60e-6416-4b6a-bc1f-c38f1e909d5a"),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                child: FutureBuilder(
+                    future: _getDestinations(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        return PageView.builder(
+                          physics: BouncingScrollPhysics(),
+                          controller: _pageController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: EdgeInsets.only(right: 28.8),
+                              width: 300,
+                              height: 180,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(9.6),
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                    snapshot.data[index].imageurl,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      } else if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else {
+                        String error = snapshot.error.toString();
+                        return Center(child: Text(error));
+                      }
+                    }),
               ),
               // Smooth page indicator part
               Padding(
                 padding: EdgeInsets.only(left: 28.8, top: 20),
                 child: SmoothPageIndicator(
                   controller: _pageController,
-                  count: 3,
+                  count: destinations.length,
                   effect: ExpandingDotsEffect(
                     activeDotColor: Theme.of(context).primaryColor,
                     dotHeight: 9,
