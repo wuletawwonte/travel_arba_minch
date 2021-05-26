@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:travel_arba_minch/widgets/custom_tab_indicator.dart';
+import 'package:travel_arba_minch/widgets/destination_widget.dart';
 
 import 'models/destination.dart';
 
@@ -27,15 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final response = await http
           .get(Uri.parse('http://10.144.12.82/public/rest/destinations'));
-      if (response.statusCode == 200) {
-        Iterable result = json.decode(response.body);
-        setState(() {
-          destinations = result.map((m) => Destination.fromJSON(m)).toList();
-        });
-        return destinations;
-      } else {
-        throw "Unable to fetch Destinations";
-      }
+      Iterable result = json.decode(response.body);
+      setState(() {
+        destinations = result.map((m) => Destination.fromJSON(m)).toList();
+      });
+      return destinations;
     } on SocketException {
       throw "No Internet Connection";
     } on HttpException {
@@ -150,43 +148,46 @@ class _HomeScreenState extends State<HomeScreen> {
                           scrollDirection: Axis.horizontal,
                           itemCount: snapshot.data.length,
                           itemBuilder: (context, index) {
-                            return Container(
-                              margin: EdgeInsets.only(right: 28.8),
-                              width: 300,
-                              height: 180,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(9.6),
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                    snapshot.data[index].imageurl,
-                                  ),
-                                ),
-                              ),
-                            );
+                            return DestinationWidget(
+                                name: snapshot.data[index].name,
+                                imageUrl: snapshot.data[index].imageurl);
                           },
                         );
-                      } else if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else {
+                      } else if (snapshot.hasError) {
                         String error = snapshot.error.toString();
-                        return Center(child: Text(error));
+                        return Center(
+                            child: Text(error,
+                                style: TextStyle(color: Colors.red)));
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        );
                       }
                     }),
               ),
               // Smooth page indicator part
-              Padding(
-                padding: EdgeInsets.only(left: 28.8, top: 20),
-                child: SmoothPageIndicator(
-                  controller: _pageController,
-                  count: destinations.length,
-                  effect: ExpandingDotsEffect(
-                    activeDotColor: Theme.of(context).primaryColor,
-                    dotHeight: 9,
-                    dotWidth: 9,
-                  ),
-                ),
+              FutureBuilder(
+                future: _getDestinations(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    return Padding(
+                      padding: EdgeInsets.only(left: 28.8, top: 20),
+                      child: SmoothPageIndicator(
+                        controller: _pageController,
+                        count: snapshot.data.length,
+                        effect: ExpandingDotsEffect(
+                          activeDotColor: Theme.of(context).primaryColor,
+                          dotHeight: 9,
+                          dotWidth: 9,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return SizedBox();
+                  }
+                },
               )
             ],
           ),
