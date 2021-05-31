@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<List<Destination>> _getDestinations() async {
     try {
       final response = await http
-          .get(Uri.parse('http://10.144.12.82/public/rest/destinations'));
+          .get(Uri.parse('http://192.168.1.129/public/rest/destinations'));
       Iterable result = json.decode(response.body);
       setState(() {
         destinations = result.map((m) => Destination.fromJSON(m)).toList();
@@ -179,8 +179,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         count: snapshot.data.length,
                         effect: ExpandingDotsEffect(
                           activeDotColor: Theme.of(context).primaryColor,
-                          dotHeight: 9,
-                          dotWidth: 9,
+                          dotHeight: 8,
+                          dotWidth: 8,
+                          spacing: 4.8,
                         ),
                       ),
                     );

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class DestinationWidget extends StatelessWidget {
@@ -17,7 +18,7 @@ class DestinationWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(9.6),
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: NetworkImage(
+          image: CachedNetworkImageProvider(
             this.imageUrl,
           ),
         ),
@@ -25,8 +26,8 @@ class DestinationWidget extends StatelessWidget {
       child: Stack(
         children: [
           Positioned(
-            bottom: 19.2,
             left: 19.2,
+            bottom: 19.2,
             right: 19.2,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4.8),
